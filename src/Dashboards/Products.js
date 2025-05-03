@@ -1,22 +1,28 @@
-import * as React from "react";
-import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Fab from "@mui/material/Fab";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import {
+  Box,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Fab,
+  IconButton,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
-import Title from "./Title.js";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { Link } from "react-router-dom";
-import Box from "@mui/material/Box";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import Title from "./Title";
 
 export default function Products() {
   const [ListProductos, setListProductos] = useState([]);
+  const [message, setMessage] = useState(""); 
+  const [severity, setSeverity] = useState("success"); 
+  const [openSnackbar, setOpenSnackbar] = useState(false); 
 
   useEffect(() => {
     getProductos();
@@ -30,16 +36,34 @@ export default function Products() {
         setListProductos(response.data.data);
       })
       .catch((e) => {
+        setMessage("Error al cargar los productos");
+        setSeverity("error");
+        setOpenSnackbar(true);
         console.log(e);
       });
   };
 
   //DELETE PRODUCTS
   const deleteProducto = async (idProducto) => {
-    await axios.delete(
-      `http://localhost:8086/api/producto/delete/${idProducto}`
-    );
-    getProductos();
+    await axios
+      .delete(`http://localhost:8086/api/producto/delete/${idProducto}`)
+      .then(() => {
+        setMessage("Producto eliminado exitosamente");
+        setSeverity("success");
+        setOpenSnackbar(true);
+        getProductos();
+      })
+      .catch((e) => {
+        setMessage("Error al eliminar el producto");
+        setSeverity("error");
+        setOpenSnackbar(true);
+        console.log(e);
+      });
+  };
+
+  //Cerrar el snackbar
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
@@ -101,6 +125,21 @@ export default function Products() {
           </TableBody>
         </Table>
       </Box>
+
+      {/* Snackbar para mostrar el mensaje */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={severity}
+          sx={{ width: "100%" }}
+        >
+          {message}
+        </Alert>
+      </Snackbar>
     </React.Fragment>
   );
 }

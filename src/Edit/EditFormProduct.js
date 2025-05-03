@@ -203,10 +203,10 @@ const FormProduct = () => {
           variant="text"
           aria-label="Basic button group"
         >
-          <Button type="submit" color="success" onClick={onSubmit}>
+          <Button type="submit" color="primary" onClick={onSubmit}>
             Guardar
           </Button>
-          <Button color="success" component={Link} to="/products">
+          <Button color="primary" component={Link} to="/">
             Cancelar
           </Button>
         </ButtonGroup>
